@@ -1,4 +1,4 @@
-package com.personalapplication.personal_application_backend;
+package com.personalapplication;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

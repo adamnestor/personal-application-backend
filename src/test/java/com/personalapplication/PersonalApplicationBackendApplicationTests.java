@@ -1,4 +1,4 @@
-package com.personalapplication.personal_application_backend;
+package com.personalapplication;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
