@@ -31,6 +31,10 @@ public class ScheduledExpense {
     @JoinColumn(name = "template_id")
     private ExpenseTemplate template;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     // Constructors
     public ScheduledExpense() {}
 
@@ -40,6 +44,15 @@ public class ScheduledExpense {
         this.scheduledDate = scheduledDate;
         this.yearValue = scheduledDate.getYear();
         this.monthValue = scheduledDate.getMonthValue();
+    }
+
+    public ScheduledExpense(String name, BigDecimal amount, LocalDate scheduledDate, User user) {
+        this.name = name;
+        this.amount = amount;
+        this.scheduledDate = scheduledDate;
+        this.yearValue = scheduledDate.getYear();
+        this.monthValue = scheduledDate.getMonthValue();
+        this.user = user;
     }
 
     // Getters and Setters
@@ -67,4 +80,7 @@ public class ScheduledExpense {
 
     public ExpenseTemplate getTemplate() { return template; }
     public void setTemplate(ExpenseTemplate template) { this.template = template; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

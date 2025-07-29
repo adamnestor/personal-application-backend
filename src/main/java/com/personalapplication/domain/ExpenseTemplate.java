@@ -30,6 +30,10 @@ public class ExpenseTemplate {
     @Column(nullable = false)
     private boolean active = true;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     // Constructors
     public ExpenseTemplate() {}
 
@@ -37,6 +41,13 @@ public class ExpenseTemplate {
         this.name = name;
         this.amount = amount;
         this.recurrenceType = recurrenceType;
+    }
+
+    public ExpenseTemplate(String name, BigDecimal amount, RecurrenceType recurrenceType, User user) {
+        this.name = name;
+        this.amount = amount;
+        this.recurrenceType = recurrenceType;
+        this.user = user;
     }
 
     // Getters and Setters
@@ -63,5 +74,7 @@ public class ExpenseTemplate {
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
-}
 
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
+}

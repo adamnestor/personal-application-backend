@@ -26,6 +26,10 @@ public class ScheduledIncome {
     @Column(name = "income_month", nullable = false)
     private int monthValue; // 1-12
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     // Could add IncomeTemplate later for recurring income
 
     // Constructors
@@ -37,6 +41,15 @@ public class ScheduledIncome {
         this.scheduledDate = scheduledDate;
         this.yearValue = scheduledDate.getYear();
         this.monthValue = scheduledDate.getMonthValue();
+    }
+
+    public ScheduledIncome(String name, BigDecimal amount, LocalDate scheduledDate, User user) {
+        this.name = name;
+        this.amount = amount;
+        this.scheduledDate = scheduledDate;
+        this.yearValue = scheduledDate.getYear();
+        this.monthValue = scheduledDate.getMonthValue();
+        this.user = user;
     }
 
     // Getters and Setters
@@ -61,4 +74,7 @@ public class ScheduledIncome {
 
     public int getMonthValue() { return monthValue; }
     public void setMonthValue(int monthValue) { this.monthValue = monthValue; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }
