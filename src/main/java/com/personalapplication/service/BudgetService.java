@@ -120,14 +120,14 @@ public class BudgetService {
      * Get all scheduled expenses for a month
      */
     public List<ScheduledExpense> getMonthlyExpenses(int year, int month) {
-        return scheduledExpenseRepository.findByYearAndMonthOrderByScheduledDate(year, month);
+        return scheduledExpenseRepository.findByYearValueAndMonthValueOrderByScheduledDate(year, month);
     }
 
     /**
      * Get all scheduled income for a month
      */
     public List<ScheduledIncome> getMonthlyIncome(int year, int month) {
-        return scheduledIncomeRepository.findByYearAndMonthOrderByScheduledDate(year, month);
+        return scheduledIncomeRepository.findByYearValueAndMonthValueOrderByScheduledDate(year, month);
     }
 
     /**
@@ -186,9 +186,9 @@ public class BudgetService {
         LocalDate previousMonth = firstOfMonth.minusMonths(1);
 
         // Check if we have any data before this month
-        boolean hasDataBefore = scheduledExpenseRepository.findByYearAndMonthOrderByScheduledDate(
+        boolean hasDataBefore = scheduledExpenseRepository.findByYearValueAndMonthValueOrderByScheduledDate(
                 previousMonth.getYear(), previousMonth.getMonthValue()).size() > 0 ||
-                scheduledIncomeRepository.findByYearAndMonthOrderByScheduledDate(
+                scheduledIncomeRepository.findByYearValueAndMonthValueOrderByScheduledDate(
                         previousMonth.getYear(), previousMonth.getMonthValue()).size() > 0;
 
         if (!hasDataBefore) {

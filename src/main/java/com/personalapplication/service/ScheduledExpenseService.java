@@ -55,11 +55,8 @@ public class ScheduledExpenseService {
                 .orElseThrow(() -> new RuntimeException("Expense not found"));
     }
 
-    /**
-     * Get all expenses for a specific month
-     */
     public List<ScheduledExpense> getExpensesForMonth(int year, int month) {
-        return scheduledExpenseRepository.findByYearAndMonthOrderByScheduledDate(year, month);
+        return scheduledExpenseRepository.findByYearValueAndMonthValueOrderByScheduledDate(year, month);
     }
 
     /**

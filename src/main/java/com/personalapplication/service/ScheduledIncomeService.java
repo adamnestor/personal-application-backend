@@ -55,11 +55,8 @@ public class ScheduledIncomeService {
                 .orElseThrow(() -> new RuntimeException("Income not found"));
     }
 
-    /**
-     * Get all income for a specific month
-     */
     public List<ScheduledIncome> getIncomeForMonth(int year, int month) {
-        return scheduledIncomeRepository.findByYearAndMonthOrderByScheduledDate(year, month);
+        return scheduledIncomeRepository.findByYearValueAndMonthValueOrderByScheduledDate(year, month);
     }
 
     /**

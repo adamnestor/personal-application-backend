@@ -20,11 +20,11 @@ public class ScheduledIncome {
     @Column(nullable = false)
     private LocalDate scheduledDate;
 
-    @Column(nullable = false)
-    private int year;
+    @Column(name = "income_year", nullable = false)
+    private int yearValue;
 
-    @Column(nullable = false)
-    private int month; // 1-12
+    @Column(name = "income_month", nullable = false)
+    private int monthValue; // 1-12
 
     // Could add IncomeTemplate later for recurring income
 
@@ -35,8 +35,8 @@ public class ScheduledIncome {
         this.name = name;
         this.amount = amount;
         this.scheduledDate = scheduledDate;
-        this.year = scheduledDate.getYear();
-        this.month = scheduledDate.getMonthValue();
+        this.yearValue = scheduledDate.getYear();
+        this.monthValue = scheduledDate.getMonthValue();
     }
 
     // Getters and Setters
@@ -52,13 +52,13 @@ public class ScheduledIncome {
     public LocalDate getScheduledDate() { return scheduledDate; }
     public void setScheduledDate(LocalDate scheduledDate) {
         this.scheduledDate = scheduledDate;
-        this.year = scheduledDate.getYear();
-        this.month = scheduledDate.getMonthValue();
+        this.yearValue = scheduledDate.getYear();
+        this.monthValue = scheduledDate.getMonthValue();
     }
 
-    public int getYear() { return year; }
-    public void setYear(int year) { this.year = year; }
+    public int getYearValue() { return yearValue; }
+    public void setYearValue(int yearValue) { this.yearValue = yearValue; }
 
-    public int getMonth() { return month; }
-    public void setMonth(int month) { this.month = month; }
+    public int getMonthValue() { return monthValue; }
+    public void setMonthValue(int monthValue) { this.monthValue = monthValue; }
 }
