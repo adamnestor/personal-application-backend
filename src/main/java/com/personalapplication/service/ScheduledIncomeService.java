@@ -59,7 +59,7 @@ public class ScheduledIncomeService {
      * Get all income for a specific month
      */
     public List<ScheduledIncome> getIncomeForMonth(int year, int month) {
-        return scheduledIncomeRepository.findByYearAndMonthOrderByScheduledDate(year, month);
+        return scheduledIncomeRepository.findByYearAndMonthValueOrderByScheduledDate(year, month);
     }
 
     /**

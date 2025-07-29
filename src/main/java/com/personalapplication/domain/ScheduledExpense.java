@@ -20,10 +20,10 @@ public class ScheduledExpense {
     @Column(nullable = false)
     private LocalDate scheduledDate;
 
-    @Column(nullable = false)
+    @Column(name = "expense_year", nullable = false)
     private int year;
 
-    @Column(nullable = false)
+    @Column(name = "expense_month", nullable = false)
     private int month; // 1-12
 
     // Reference to template if this came from recurring expense

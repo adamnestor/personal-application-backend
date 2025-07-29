@@ -59,7 +59,7 @@ public class ScheduledExpenseService {
      * Get all expenses for a specific month
      */
     public List<ScheduledExpense> getExpensesForMonth(int year, int month) {
-        return scheduledExpenseRepository.findByYearAndMonthOrderByScheduledDate(year, month);
+        return scheduledExpenseRepository.findByYearAndMonthValueOrderByScheduledDate(year, month);
     }
 
     /**

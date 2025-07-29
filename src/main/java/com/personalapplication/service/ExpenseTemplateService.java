@@ -7,7 +7,6 @@ import com.personalapplication.repository.ScheduledExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -112,6 +111,6 @@ public class ExpenseTemplateService {
     public boolean hasInstancesInMonth(Long templateId, int year, int month) {
         List<ScheduledExpense> expenses = scheduledExpenseRepository.findByTemplateId(templateId);
         return expenses.stream()
-                .anyMatch(e -> e.getYear() == year && e.getMonth() == month);
+                .anyMatch(e -> e.getYear() == year && e.getMonthValue() == month);
     }
 }

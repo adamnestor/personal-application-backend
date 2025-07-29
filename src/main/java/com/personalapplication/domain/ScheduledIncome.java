@@ -20,11 +20,11 @@ public class ScheduledIncome {
     @Column(nullable = false)
     private LocalDate scheduledDate;
 
-    @Column(nullable = false)
+    @Column(name = "income_year", nullable = false)
     private int year;
 
-    @Column(nullable = false)
-    private int month; // 1-12
+    @Column(name = "income_month", nullable = false)
+    private int monthValue; // 1-12
 
     // Could add IncomeTemplate later for recurring income
 
@@ -36,7 +36,7 @@ public class ScheduledIncome {
         this.amount = amount;
         this.scheduledDate = scheduledDate;
         this.year = scheduledDate.getYear();
-        this.month = scheduledDate.getMonthValue();
+        this.monthValue = scheduledDate.getMonthValue();
     }
 
     // Getters and Setters
@@ -59,6 +59,6 @@ public class ScheduledIncome {
     public int getYear() { return year; }
     public void setYear(int year) { this.year = year; }
 
-    public int getMonth() { return month; }
-    public void setMonth(int month) { this.month = month; }
+    public int getMonthValue() { return monthValue; }
+    public void setMonthValue(int monthValue) { this.monthValue = monthValue; }
 }
