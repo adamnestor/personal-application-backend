@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface ScheduledIncomeRepository extends JpaRepository<ScheduledIncome, Long> {
-    List<ScheduledIncome> findByYearAndMonthValueOrderByScheduledDate(int year, int month);
+    List<ScheduledIncome> findByYearValueAndMonthValueOrderByScheduledDate(int yearValue, int monthValue);
 }

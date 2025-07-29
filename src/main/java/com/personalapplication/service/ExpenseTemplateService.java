@@ -111,6 +111,6 @@ public class ExpenseTemplateService {
     public boolean hasInstancesInMonth(Long templateId, int year, int month) {
         List<ScheduledExpense> expenses = scheduledExpenseRepository.findByTemplateId(templateId);
         return expenses.stream()
-                .anyMatch(e -> e.getYear() == year && e.getMonthValue() == month);
+                .anyMatch(e -> e.getYearValue() == year && e.getMonthValue() == month);
     }
 }

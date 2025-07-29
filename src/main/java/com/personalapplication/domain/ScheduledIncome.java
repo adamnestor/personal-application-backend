@@ -21,7 +21,7 @@ public class ScheduledIncome {
     private LocalDate scheduledDate;
 
     @Column(name = "income_year", nullable = false)
-    private int year;
+    private int yearValue;
 
     @Column(name = "income_month", nullable = false)
     private int monthValue; // 1-12
@@ -35,7 +35,7 @@ public class ScheduledIncome {
         this.name = name;
         this.amount = amount;
         this.scheduledDate = scheduledDate;
-        this.year = scheduledDate.getYear();
+        this.yearValue = scheduledDate.getYear();
         this.monthValue = scheduledDate.getMonthValue();
     }
 
@@ -52,12 +52,12 @@ public class ScheduledIncome {
     public LocalDate getScheduledDate() { return scheduledDate; }
     public void setScheduledDate(LocalDate scheduledDate) {
         this.scheduledDate = scheduledDate;
-        this.year = scheduledDate.getYear();
-        this.month = scheduledDate.getMonthValue();
+        this.yearValue = scheduledDate.getYear();
+        this.monthValue = scheduledDate.getMonthValue();
     }
 
-    public int getYear() { return year; }
-    public void setYear(int year) { this.year = year; }
+    public int getYearValue() { return yearValue; }
+    public void setYearValue(int yearValue) { this.yearValue = yearValue; }
 
     public int getMonthValue() { return monthValue; }
     public void setMonthValue(int monthValue) { this.monthValue = monthValue; }

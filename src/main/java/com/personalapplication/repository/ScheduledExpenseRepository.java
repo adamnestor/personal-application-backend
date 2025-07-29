@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface ScheduledExpenseRepository extends JpaRepository<ScheduledExpense, Long> {
-    List<ScheduledExpense> findByYearAndMonthValueOrderByScheduledDate(int year, int month);
+    List<ScheduledExpense> findByYearValueAndMonthValueOrderByScheduledDate(int yearValue, int monthValue);
     boolean existsByTemplateAndScheduledDate(ExpenseTemplate template, LocalDate scheduledDate);
     List<ScheduledExpense> findByTemplateId(Long templateId);
 }
