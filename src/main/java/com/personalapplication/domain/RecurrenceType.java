@@ -1,4 +1,4 @@
-package com.personalapplication.personal_application_backend.domain;
+package com.personalapplication.domain;
 
 public enum RecurrenceType {
     MONTHLY,    // Same day each month
