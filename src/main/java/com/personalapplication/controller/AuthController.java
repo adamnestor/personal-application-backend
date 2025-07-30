@@ -81,6 +81,12 @@ public class AuthController {
                 signupRequest.getEmail()
         );
 
+        // Add security question if provided
+        if (signupRequest.getSecurityQuestion() != null && signupRequest.getSecurityAnswer() != null) {
+            user.setSecurityQuestion(signupRequest.getSecurityQuestion());
+            user.setSecurityAnswer(passwordEncoder.encode(signupRequest.getSecurityAnswer().toLowerCase().trim()));
+        }
+
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
@@ -100,6 +106,48 @@ public class AuthController {
             }
         }
         return ResponseEntity.ok(new ValidationResponse(false, null));
+    }
+
+    /**
+     * Get security question for username
+     * POST /api/auth/security-question
+     */
+    @PostMapping("/security-question")
+    public ResponseEntity<?> getSecurityQuestion(@Valid @RequestBody UsernameRequest request) {
+        User user = userRepository.findByUsername(request.getUsername()).orElse(null);
+
+        if (user == null || user.getSecurityQuestion() == null) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error: User not found or no security question set!"));
+        }
+
+        return ResponseEntity.ok(new SecurityQuestionResponse(user.getSecurityQuestion()));
+    }
+
+    /**
+     * Reset password using security question
+     * POST /api/auth/reset-password
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetRequest request) {
+        User user = userRepository.findByUsername(request.getUsername()).orElse(null);
+
+        if (user == null || user.getSecurityQuestion() == null) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error: User not found or no security question set!"));
+        }
+
+        // Check if security answer matches (case-insensitive)
+        if (!passwordEncoder.matches(request.getSecurityAnswer().toLowerCase().trim(), user.getSecurityAnswer())) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error: Incorrect security answer!"));
+        }
+
+        // Update password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        return ResponseEntity.ok(new MessageResponse("Password reset successfully!"));
     }
 
     // DTO Classes
@@ -134,6 +182,9 @@ public class AuthController {
         @Size(min = 6, max = 40)
         private String password;
 
+        private String securityQuestion;
+        private String securityAnswer;
+
         // Getters and setters
         public String getUsername() { return username; }
         public void setUsername(String username) { this.username = username; }
@@ -143,6 +194,12 @@ public class AuthController {
 
         public String getPassword() { return password; }
         public void setPassword(String password) { this.password = password; }
+
+        public String getSecurityQuestion() { return securityQuestion; }
+        public void setSecurityQuestion(String securityQuestion) { this.securityQuestion = securityQuestion; }
+
+        public String getSecurityAnswer() { return securityAnswer; }
+        public void setSecurityAnswer(String securityAnswer) { this.securityAnswer = securityAnswer; }
     }
 
     public static class JwtResponse {
@@ -164,6 +221,46 @@ public class AuthController {
 
         public String getUsername() { return username; }
         public void setUsername(String username) { this.username = username; }
+    }
+
+    public static class UsernameRequest {
+        @NotBlank
+        private String username;
+
+        public String getUsername() { return username; }
+        public void setUsername(String username) { this.username = username; }
+    }
+
+    public static class PasswordResetRequest {
+        @NotBlank
+        private String username;
+
+        @NotBlank
+        private String securityAnswer;
+
+        @NotBlank
+        @Size(min = 6, max = 40)
+        private String newPassword;
+
+        public String getUsername() { return username; }
+        public void setUsername(String username) { this.username = username; }
+
+        public String getSecurityAnswer() { return securityAnswer; }
+        public void setSecurityAnswer(String securityAnswer) { this.securityAnswer = securityAnswer; }
+
+        public String getNewPassword() { return newPassword; }
+        public void setNewPassword(String newPassword) { this.newPassword = newPassword; }
+    }
+
+    public static class SecurityQuestionResponse {
+        private String securityQuestion;
+
+        public SecurityQuestionResponse(String securityQuestion) {
+            this.securityQuestion = securityQuestion;
+        }
+
+        public String getSecurityQuestion() { return securityQuestion; }
+        public void setSecurityQuestion(String securityQuestion) { this.securityQuestion = securityQuestion; }
     }
 
     public static class MessageResponse {

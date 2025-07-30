@@ -27,7 +27,13 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean enabled = true;
 
-    // Relationships (we'll add these later)
+    @Column(name = "security_question")
+    private String securityQuestion;
+
+    @Column(name = "security_answer")
+    private String securityAnswer; // Will be hashed like password
+
+    // Relationships
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Account> accounts;
 
@@ -47,6 +53,14 @@ public class User implements UserDetails {
         this.username = username;
         this.password = password;
         this.email = email;
+    }
+
+    public User(String username, String password, String email, String securityQuestion, String securityAnswer) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.securityQuestion = securityQuestion;
+        this.securityAnswer = securityAnswer;
     }
 
     // UserDetails implementation
@@ -89,6 +103,12 @@ public class User implements UserDetails {
     public void setEmail(String email) { this.email = email; }
 
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
+
+    public String getSecurityQuestion() { return securityQuestion; }
+    public void setSecurityQuestion(String securityQuestion) { this.securityQuestion = securityQuestion; }
+
+    public String getSecurityAnswer() { return securityAnswer; }
+    public void setSecurityAnswer(String securityAnswer) { this.securityAnswer = securityAnswer; }
 
     public List<Account> getAccounts() { return accounts; }
     public void setAccounts(List<Account> accounts) { this.accounts = accounts; }
