@@ -1,5 +1,6 @@
 package com.personalapplication.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
@@ -16,8 +17,10 @@ public class Account {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal startingBalance;
 
+    // User relationship - IGNORE in JSON to prevent circular reference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     // Constructors
