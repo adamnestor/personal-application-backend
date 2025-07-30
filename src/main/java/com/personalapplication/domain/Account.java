@@ -1,5 +1,6 @@
 package com.personalapplication.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
@@ -16,11 +17,22 @@ public class Account {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal startingBalance;
 
+    // User relationship - IGNORE in JSON to prevent circular reference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
+    private User user;
+
     // Constructors
     public Account() {}
 
     public Account(BigDecimal startingBalance) {
         this.startingBalance = startingBalance;
+    }
+
+    public Account(BigDecimal startingBalance, User user) {
+        this.startingBalance = startingBalance;
+        this.user = user;
     }
 
     // Getters and Setters
@@ -32,4 +44,7 @@ public class Account {
 
     public BigDecimal getStartingBalance() { return startingBalance; }
     public void setStartingBalance(BigDecimal startingBalance) { this.startingBalance = startingBalance; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }

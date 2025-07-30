@@ -3,6 +3,7 @@ package com.personalapplication.service;
 import com.personalapplication.domain.*;
 import com.personalapplication.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,11 +26,24 @@ public class BudgetService {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     /**
-     * Generate scheduled expenses for a given month from active templates
+     * Get the current authenticated user
+     */
+    private User getCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+    }
+
+    /**
+     * Generate scheduled expenses for a given month from active templates for the current user
      */
     public void generateMonthlyExpenses(int year, int month) {
-        List<ExpenseTemplate> activeTemplates = expenseTemplateRepository.findByActiveTrue();
+        User currentUser = getCurrentUser();
+        List<ExpenseTemplate> activeTemplates = expenseTemplateRepository.findByUserIdAndActiveTrue(currentUser.getId());
         YearMonth yearMonth = YearMonth.of(year, month);
 
         for (ExpenseTemplate template : activeTemplates) {
@@ -37,12 +51,14 @@ public class BudgetService {
 
             for (LocalDate date : dates) {
                 // Check if expense already exists for this template and date
-                boolean exists = scheduledExpenseRepository.existsByTemplateAndScheduledDate(template, date);
+                boolean exists = scheduledExpenseRepository.existsByUserIdAndTemplateAndScheduledDate(
+                        currentUser.getId(), template, date);
                 if (!exists) {
                     ScheduledExpense expense = new ScheduledExpense(
                             template.getName(),
                             template.getAmount(),
-                            date
+                            date,
+                            currentUser
                     );
                     expense.setTemplate(template);
                     scheduledExpenseRepository.save(expense);
@@ -117,21 +133,25 @@ public class BudgetService {
     }
 
     /**
-     * Get all scheduled expenses for a month
+     * Get all scheduled expenses for a month for the current user
      */
     public List<ScheduledExpense> getMonthlyExpenses(int year, int month) {
-        return scheduledExpenseRepository.findByYearValueAndMonthValueOrderByScheduledDate(year, month);
+        User currentUser = getCurrentUser();
+        return scheduledExpenseRepository.findByUserIdAndYearValueAndMonthValueOrderByScheduledDate(
+                currentUser.getId(), year, month);
     }
 
     /**
-     * Get all scheduled income for a month
+     * Get all scheduled income for a month for the current user
      */
     public List<ScheduledIncome> getMonthlyIncome(int year, int month) {
-        return scheduledIncomeRepository.findByYearValueAndMonthValueOrderByScheduledDate(year, month);
+        User currentUser = getCurrentUser();
+        return scheduledIncomeRepository.findByUserIdAndYearValueAndMonthValueOrderByScheduledDate(
+                currentUser.getId(), year, month);
     }
 
     /**
-     * Calculate daily running balances for a month
+     * Calculate daily running balances for a month for the current user
      * Starting balance = ending balance of previous month
      */
     public Map<LocalDate, BigDecimal> calculateDailyBalances(int year, int month) {
@@ -172,24 +192,27 @@ public class BudgetService {
     }
 
     /**
-     * Get the starting balance for a given month
+     * Get the starting balance for a given month for the current user
      * For the first month ever, use account starting balance
      * Otherwise, use the ending balance of the previous month
      */
     private BigDecimal getStartingBalanceForMonth(int year, int month) {
-        // Get the account (assuming single account for now)
-        Account account = accountRepository.findAll().stream().findFirst()
-                .orElse(new Account(BigDecimal.ZERO));
+        User currentUser = getCurrentUser();
+
+        // Get the account for current user (assuming single account for now)
+        List<Account> accounts = accountRepository.findByUserId(currentUser.getId());
+        Account account = accounts.stream().findFirst()
+                .orElse(new Account(BigDecimal.ZERO, currentUser));
 
         // If this is the first month we have data for, use account starting balance
         LocalDate firstOfMonth = LocalDate.of(year, month, 1);
         LocalDate previousMonth = firstOfMonth.minusMonths(1);
 
-        // Check if we have any data before this month
-        boolean hasDataBefore = scheduledExpenseRepository.findByYearValueAndMonthValueOrderByScheduledDate(
-                previousMonth.getYear(), previousMonth.getMonthValue()).size() > 0 ||
-                scheduledIncomeRepository.findByYearValueAndMonthValueOrderByScheduledDate(
-                        previousMonth.getYear(), previousMonth.getMonthValue()).size() > 0;
+        // Check if we have any data before this month for this user
+        boolean hasDataBefore = scheduledExpenseRepository.findByUserIdAndYearValueAndMonthValueOrderByScheduledDate(
+                currentUser.getId(), previousMonth.getYear(), previousMonth.getMonthValue()).size() > 0 ||
+                scheduledIncomeRepository.findByUserIdAndYearValueAndMonthValueOrderByScheduledDate(
+                        currentUser.getId(), previousMonth.getYear(), previousMonth.getMonthValue()).size() > 0;
 
         if (!hasDataBefore) {
             return account.getStartingBalance();
@@ -214,7 +237,8 @@ public class BudgetService {
      * Move a scheduled expense to a different date (drag and drop on calendar)
      */
     public ScheduledExpense moveExpense(Long expenseId, LocalDate newDate) {
-        ScheduledExpense expense = scheduledExpenseRepository.findById(expenseId)
+        User currentUser = getCurrentUser();
+        ScheduledExpense expense = scheduledExpenseRepository.findByUserIdAndId(currentUser.getId(), expenseId)
                 .orElseThrow(() -> new RuntimeException("Expense not found"));
 
         expense.setScheduledDate(newDate);
@@ -225,7 +249,8 @@ public class BudgetService {
      * Move a scheduled income to a different date
      */
     public ScheduledIncome moveIncome(Long incomeId, LocalDate newDate) {
-        ScheduledIncome income = scheduledIncomeRepository.findById(incomeId)
+        User currentUser = getCurrentUser();
+        ScheduledIncome income = scheduledIncomeRepository.findByUserIdAndId(currentUser.getId(), incomeId)
                 .orElseThrow(() -> new RuntimeException("Income not found"));
 
         income.setScheduledDate(newDate);
@@ -236,13 +261,15 @@ public class BudgetService {
      * Create a new expense instance from a template (drag from left panel)
      */
     public ScheduledExpense createExpenseFromTemplate(Long templateId, LocalDate scheduledDate) {
-        ExpenseTemplate template = expenseTemplateRepository.findById(templateId)
+        User currentUser = getCurrentUser();
+        ExpenseTemplate template = expenseTemplateRepository.findByUserIdAndId(currentUser.getId(), templateId)
                 .orElseThrow(() -> new RuntimeException("Template not found"));
 
         ScheduledExpense expense = new ScheduledExpense(
                 template.getName(),
                 template.getAmount(),
-                scheduledDate
+                scheduledDate,
+                currentUser
         );
         expense.setTemplate(template);
 
